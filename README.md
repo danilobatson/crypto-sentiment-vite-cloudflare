@@ -18,6 +18,20 @@
 
 *Search any cryptocurrency symbol to get instant sentiment analysis with Galaxy Score, Alt Rank, social volume, and price data.*
 
+## 📖 Tutorial
+
+**[📚 Read the complete tutorial](https://dev.to/yourusername/your-article-slug)** - Learn how to build this crypto sentiment dashboard step-by-step in 15 minutes.
+
+This tutorial covers:
+
+- Modern full-stack development with Vite and React
+- Serverless architecture with Cloudflare Workers
+- Real-time API integration with LunarCrush
+- Professional CI/CD setup with GitHub Actions
+- Production deployment to global edge network
+
+Perfect for developers learning modern web development patterns and edge computing.
+
 ## ✨ Features
 
 - **⚡ Edge-Deployed** - Runs on 300+ global Cloudflare locations for sub-50ms responses
@@ -37,10 +51,10 @@
 
 ## 🎭 Demo Mode & Error Handling
 
-| Demo Mode | Error Handling |
-|:---:|:---:|
+|                                     Demo Mode                                     |                                  Error Handling                                  |
+| :-------------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
 | ![Demo mode with mock data](crypto-sentiment-dashboard/screenshots/demo-mode.png) | ![Input validation](crypto-sentiment-dashboard/screenshots/validation-error.png) |
-| *Demo mode with realistic mock data* | *Smart input validation and error handling* |
+|                       *Demo mode with realistic mock data*                        |                   *Smart input validation and error handling*                    |
 
 ## 🎯 Why This Project?
 
