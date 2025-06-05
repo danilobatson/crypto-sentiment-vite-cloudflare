@@ -189,7 +189,7 @@ export default {
 								error: 'Cryptocurrency not found',
 								message: `The cryptocurrency "${symbol.toUpperCase()}" was not found. Please check the symbol and try again.`,
 								suggestion:
-									'Try popular symbols like BTC, ETH, SOL, ADA, MATIC, DOT, etc.',
+									'Try popular symbols like BTC, ETH, SOL, ADA, DOT, etc.',
 							}),
 							{
 								status: 404,
