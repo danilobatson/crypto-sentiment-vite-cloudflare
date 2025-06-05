@@ -5,48 +5,82 @@ const MOCK_DATA = {
 	btc: {
 		symbol: 'BTC',
 		name: 'Bitcoin',
-		galaxyScore: 75.2,
-		altRank: 1,
-		socialVolume: 15420,
-		price: 104567.89,
-		priceChange24h: -2.14,
+		price: 104080.81,
+		galaxyScore: 46.3,
+		altRank: 306,
+		marketCap: 2068578645007.58,
+		volume24h: 41976305116.99,
+		percentChange24h: -1.07,
+		percentChange7d: -2.54,
+		percentChange30d: 7.27,
+		volatility: 0.0045,
+		marketCapRank: 1,
 		timestamp: new Date().toISOString(),
 	},
 	eth: {
 		symbol: 'ETH',
 		name: 'Ethereum',
+		price: 3840.23,
 		galaxyScore: 68.5,
 		altRank: 2,
-		socialVolume: 12890,
-		price: 3840.23,
-		priceChange24h: 1.87,
+		marketCap: 450000000000,
+		volume24h: 15000000000,
+		percentChange24h: 1.87,
+		percentChange7d: -1.23,
+		percentChange30d: 12.45,
+		volatility: 0.0067,
+		marketCapRank: 2,
 		timestamp: new Date().toISOString(),
 	},
 	sol: {
 		symbol: 'SOL',
 		name: 'Solana',
+		price: 248.67,
 		galaxyScore: 62.1,
 		altRank: 5,
-		socialVolume: 8750,
-		price: 248.67,
-		priceChange24h: 4.32,
+		marketCap: 118000000000,
+		volume24h: 3200000000,
+		percentChange24h: 4.32,
+		percentChange7d: 8.91,
+		percentChange30d: 22.15,
+		volatility: 0.0089,
+		marketCapRank: 5,
 		timestamp: new Date().toISOString(),
 	},
 	ada: {
 		symbol: 'ADA',
 		name: 'Cardano',
+		price: 1.23,
 		galaxyScore: 45.8,
 		altRank: 12,
-		socialVolume: 4200,
-		price: 1.23,
-		priceChange24h: -0.95,
+		marketCap: 42000000000,
+		volume24h: 890000000,
+		percentChange24h: -0.95,
+		percentChange7d: 2.14,
+		percentChange30d: -3.67,
+		volatility: 0.0056,
+		marketCapRank: 8,
+		timestamp: new Date().toISOString(),
+	},
+	dot: {
+		symbol: 'DOT',
+		name: 'Polkadot',
+		price: 8.45,
+		galaxyScore: 52.3,
+		altRank: 18,
+		marketCap: 12500000000,
+		volume24h: 320000000,
+		percentChange24h: 2.67,
+		percentChange7d: -1.89,
+		percentChange30d: 15.42,
+		volatility: 0.0078,
+		marketCapRank: 12,
 		timestamp: new Date().toISOString(),
 	},
 };
 
 function getMockData(symbol) {
 	const lowerSymbol = symbol.toLowerCase();
-
 	if (MOCK_DATA[lowerSymbol]) {
 		return { ...MOCK_DATA[lowerSymbol], isMockData: true };
 	}
@@ -55,11 +89,16 @@ function getMockData(symbol) {
 	return {
 		symbol: symbol.toUpperCase(),
 		name: `${symbol.toUpperCase()} Token`,
+		price: Math.round((Math.random() * 1000 + 0.01) * 100) / 100,
 		galaxyScore: Math.round((Math.random() * 80 + 10) * 10) / 10,
 		altRank: Math.floor(Math.random() * 500) + 1,
-		socialVolume: Math.floor(Math.random() * 10000),
-		price: Math.round((Math.random() * 1000 + 0.01) * 100) / 100,
-		priceChange24h: Math.round((Math.random() * 20 - 10) * 100) / 100,
+		marketCap: Math.floor(Math.random() * 100000000000),
+		volume24h: Math.floor(Math.random() * 5000000000),
+		percentChange24h: Math.round((Math.random() * 20 - 10) * 100) / 100,
+		percentChange7d: Math.round((Math.random() * 30 - 15) * 100) / 100,
+		percentChange30d: Math.round((Math.random() * 50 - 25) * 100) / 100,
+		volatility: Math.round(Math.random() * 0.01 * 10000) / 10000,
+		marketCapRank: Math.floor(Math.random() * 1000) + 1,
 		timestamp: new Date().toISOString(),
 		isMockData: true,
 	};
@@ -80,28 +119,11 @@ export default {
 			});
 		}
 
-		// Health check endpoint
-		if (url.pathname === '/api/health') {
-			return new Response(
-				JSON.stringify({
-					status: 'healthy',
-					timestamp: new Date().toISOString(),
-					hasApiKey: !!env.LUNARCRUSH_API_KEY,
-				}),
-				{
-					headers: {
-						'Content-Type': 'application/json',
-						'Access-Control-Allow-Origin': '*',
-					},
-				}
-			);
-		}
-
-		// Crypto sentiment endpoint
+		// Crypto analytics endpoint
 		if (url.pathname.startsWith('/api/sentiment/')) {
 			const symbol = url.pathname.split('/')[3];
 
-			// Validate symbol format (letters only, 2-10 characters)
+			// Validate symbol format
 			if (!symbol || !/^[A-Za-z]{2,10}$/.test(symbol)) {
 				return new Response(
 					JSON.stringify({
@@ -118,90 +140,62 @@ export default {
 				);
 			}
 
-			// Check if API key is available
-			if (!env.LUNARCRUSH_API_KEY) {
-				console.log('No API key available, using mock data');
+			try {
+				// Try real API if key is available
+				if (env.LUNARCRUSH_API_KEY) {
+					const response = await fetch(
+						`https://lunarcrush.com/api4/public/coins/${symbol.toLowerCase()}/v1`,
+						{
+							headers: {
+								Authorization: `Bearer ${env.LUNARCRUSH_API_KEY}`,
+							},
+						}
+					);
+
+					if (response.ok) {
+						const data = await response.json();
+
+						if (data.data) {
+							const coinData = data.data;
+							const formatted = {
+								symbol: symbol.toUpperCase(),
+								name: coinData.name || 'Unknown',
+								price: coinData.price || 0,
+								galaxyScore: coinData.galaxy_score || 0,
+								altRank: coinData.alt_rank || 0,
+								marketCap: coinData.market_cap || 0,
+								volume24h: coinData.volume_24h || 0,
+								percentChange24h: coinData.percent_change_24h || 0,
+								percentChange7d: coinData.percent_change_7d || 0,
+								percentChange30d: coinData.percent_change_30d || 0,
+								volatility: coinData.volatility || 0,
+								marketCapRank: coinData.market_cap_rank || 0,
+								timestamp: new Date().toISOString(),
+								isMockData: false,
+							};
+
+							return new Response(JSON.stringify(formatted), {
+								headers: {
+									'Content-Type': 'application/json',
+									'Access-Control-Allow-Origin': '*',
+									'Cache-Control': 'public, max-age=300',
+								},
+							});
+						}
+					}
+				}
+
+				// Fall back to mock data
 				const mockData = getMockData(symbol);
 				return new Response(JSON.stringify(mockData), {
 					headers: {
 						'Content-Type': 'application/json',
 						'Access-Control-Allow-Origin': '*',
-						'Cache-Control': 'public, max-age=60', // Shorter cache for mock data
-					},
-				});
-			}
-
-			try {
-				// Try real API call
-				const response = await fetch(
-					`https://lunarcrush.com/api4/public/coins/${symbol.toLowerCase()}/v1`,
-					{
-						headers: {
-							Authorization: `Bearer ${env.LUNARCRUSH_API_KEY}`,
-						},
-					}
-				);
-
-				// If unauthorized or API key invalid, fall back to mock data
-				if (response.status === 401 || response.status === 403) {
-					console.log('API key invalid or unauthorized, using mock data');
-					const mockData = getMockData(symbol);
-					return new Response(JSON.stringify(mockData), {
-						headers: {
-							'Content-Type': 'application/json',
-							'Access-Control-Allow-Origin': '*',
-							'Cache-Control': 'public, max-age=60',
-						},
-					});
-				}
-
-				if (!response.ok) {
-					throw new Error(`LunarCrush API error: ${response.status}`);
-				}
-
-				const data = await response.json();
-
-				// Check if symbol exists in API
-				if (!data.data) {
-					return new Response(
-						JSON.stringify({
-							error: 'Symbol not found',
-							message: `Cryptocurrency symbol '${symbol.toUpperCase()}' not found. Try BTC, ETH, SOL, ADA, etc.`,
-						}),
-						{
-							status: 404,
-							headers: {
-								'Content-Type': 'application/json',
-								'Access-Control-Allow-Origin': '*',
-							},
-						}
-					);
-				}
-
-				// Format real API response
-				const coinData = data.data;
-				const formatted = {
-					symbol: symbol.toUpperCase(),
-					name: coinData.name || 'Unknown',
-					galaxyScore: coinData.galaxy_score || 0,
-					altRank: coinData.alt_rank || 0,
-					socialVolume: coinData.social_volume_24h || 0,
-					price: coinData.price || 0,
-					priceChange24h: coinData.percent_change_24h || 0,
-					timestamp: new Date().toISOString(),
-					isMockData: false,
-				};
-
-				return new Response(JSON.stringify(formatted), {
-					headers: {
-						'Content-Type': 'application/json',
-						'Access-Control-Allow-Origin': '*',
-						'Cache-Control': 'public, max-age=300',
+						'Cache-Control': 'public, max-age=60',
 					},
 				});
 			} catch (error) {
-				console.log('API call failed, using mock data:', error.message);
-				// Fall back to mock data on any error
+				// Always fall back to mock data on errors
 				const mockData = getMockData(symbol);
 				return new Response(JSON.stringify(mockData), {
 					headers: {
@@ -213,7 +207,23 @@ export default {
 			}
 		}
 
-		// Serve static assets for everything else
+		// Health check
+		if (url.pathname === '/api/health') {
+			return new Response(
+				JSON.stringify({
+					status: 'healthy',
+					timestamp: new Date().toISOString(),
+				}),
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						'Access-Control-Allow-Origin': '*',
+					},
+				}
+			);
+		}
+
+		// Serve static assets
 		return env.ASSETS.fetch(request);
 	},
 };

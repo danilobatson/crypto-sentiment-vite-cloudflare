@@ -84,8 +84,8 @@ function App() {
 	return (
 		<div className='app'>
 			<header className='app-header'>
-				<h1>🚀 Crypto Sentiment Dashboard</h1>
-				<p>Real-time cryptocurrency sentiment analysis powered by LunarCrush</p>
+				<h1>📊 Crypto Analytics Dashboard</h1>
+				<p>Real-time cryptocurrency market analysis powered by LunarCrush</p>
 			</header>
 
 			{/* Mock Data Banner */}
@@ -97,7 +97,7 @@ function App() {
 							<strong>Demo Mode:</strong> Using mock data for demonstration.
 							<br />
 							<small>
-								Add your LunarCrush API key to see real sentiment data.
+								Add your LunarCrush API key to see real market data.
 							</small>
 						</div>
 					</div>
@@ -121,11 +121,11 @@ function App() {
 					)}
 				</div>
 				<button type='submit' disabled={!!inputError}>
-					Get Sentiment
+					Get Analytics
 				</button>
 			</form>
 
-			{loading && <div className='loading'>Loading sentiment data...</div>}
+			{loading && <div className='loading'>Loading market data...</div>}
 
 			{error && <div className='error'>Error: {error}</div>}
 
@@ -158,16 +158,40 @@ function App() {
 							<label>24h Change</label>
 							<span
 								className={`value ${
-									cryptoData.priceChange24h >= 0 ? 'positive' : 'negative'
+									cryptoData.percentChange24h >= 0 ? 'positive' : 'negative'
 								}`}>
-								{cryptoData.priceChange24h?.toFixed(2)}%
+								{cryptoData.percentChange24h?.toFixed(2)}%
 							</span>
 						</div>
 
 						<div className='metric'>
-							<label>Social Volume</label>
+							<label>Market Cap</label>
 							<span className='value'>
-								{cryptoData.socialVolume?.toLocaleString()}
+								${(cryptoData.marketCap / 1000000000)?.toFixed(1)}B
+							</span>
+						</div>
+
+						<div className='metric'>
+							<label>Volume (24h)</label>
+							<span className='value'>
+								${(cryptoData.volume24h / 1000000000)?.toFixed(1)}B
+							</span>
+						</div>
+
+						<div className='metric'>
+							<label>7d Change</label>
+							<span
+								className={`value ${
+									cryptoData.percentChange7d >= 0 ? 'positive' : 'negative'
+								}`}>
+								{cryptoData.percentChange7d?.toFixed(2)}%
+							</span>
+						</div>
+
+						<div className='metric'>
+							<label>Volatility</label>
+							<span className='value'>
+								{(cryptoData.volatility * 100)?.toFixed(2)}%
 							</span>
 						</div>
 					</div>
