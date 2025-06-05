@@ -1,0 +1,13 @@
+name = "crypto-sentiment-dashboard"
+main = "api/index.js"
+compatibility_date = "2024-01-01"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+[vars]
+LUNARCRUSH_API_KEY = "your_lunarcrush_api_key_here"
+
+[env.development]
+vars = { NODE_ENV = "development" }
