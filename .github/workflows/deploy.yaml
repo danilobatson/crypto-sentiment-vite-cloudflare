@@ -10,6 +10,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy
+    defaults:
+      run:
+        working-directory: ./crypto-sentiment-dashboard
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,15 +22,17 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
+          cache-dependency-path: './crypto-sentiment-dashboard/package-lock.json'
 
       - name: Install dependencies
-        run: cd crypto-sentiment-dashboard && npm ci
+        run: npm ci
 
       - name: Build application
-        run: cd crypto-sentiment-dashboard && npm run build
+        run: npm run build
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: './crypto-sentiment-dashboard'
