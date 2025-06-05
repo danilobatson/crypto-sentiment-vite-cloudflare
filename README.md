@@ -8,13 +8,13 @@
 
 ## 📱 Live Demo
 
-![Crypto Sentiment Dashboard](screenshots/hero-desktop.png)
+![Crypto Sentiment Dashboard](crypto-sentiment-dashboard/screenshots/hero-desktop.png)
 
 **[🚀 Try it live](https://crypto-sentiment-dashboard.mcp-server.workers.dev/)** - Search for any cryptocurrency to see real-time sentiment analysis!
 
 ## 🎬 See It In Action
 
-![Demo GIF](demo.gif)
+![Demo GIF](crypto-sentiment-dashboard/demo.gif)
 
 *Search any cryptocurrency symbol to get instant sentiment analysis with Galaxy Score, Alt Rank, social volume, and price data.*
 
@@ -31,26 +31,16 @@
 
 ## 📱 Responsive Design
 
-<div align="center">
-  <img src="screenshots/mobile-responsive.png" alt="Mobile responsive design" width="300">
-</div>
+![Mobile responsive design](crypto-sentiment-dashboard/screenshots/mobile-responsive.png)
 
 *Fully responsive design that works perfectly on mobile, tablet, and desktop devices.*
 
 ## 🎭 Demo Mode & Error Handling
 
-<table>
-  <tr>
-    <td width="50%">
-      <img src="screenshots/demo-mode.png" alt="Demo mode with mock data" width="100%">
-      <p align="center"><em>Demo mode with realistic mock data</em></p>
-    </td>
-    <td width="50%">
-      <img src="screenshots/validation-error.png" alt="Input validation" width="100%">
-      <p align="center"><em>Smart input validation and error handling</em></p>
-    </td>
-  </tr>
-</table>
+| Demo Mode | Error Handling |
+|:---:|:---:|
+| ![Demo mode with mock data](crypto-sentiment-dashboard/screenshots/demo-mode.png) | ![Input validation](crypto-sentiment-dashboard/screenshots/validation-error.png) |
+| *Demo mode with realistic mock data* | *Smart input validation and error handling* |
 
 ## 🎯 Why This Project?
 
