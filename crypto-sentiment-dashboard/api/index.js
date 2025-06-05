@@ -119,11 +119,11 @@ export default {
 			});
 		}
 
-		// Crypto analytics endpoint
+		// Crypto sentiment endpoint
 		if (url.pathname.startsWith('/api/sentiment/')) {
 			const symbol = url.pathname.split('/')[3];
 
-			// Validate symbol format
+			// Validate symbol format (letters only, 2-10 characters)
 			if (!symbol || !/^[A-Za-z]{2,10}$/.test(symbol)) {
 				return new Response(
 					JSON.stringify({
@@ -140,52 +140,9 @@ export default {
 				);
 			}
 
-			try {
-				// Try real API if key is available
-				if (env.LUNARCRUSH_API_KEY) {
-					const response = await fetch(
-						`https://lunarcrush.com/api4/public/coins/${symbol.toLowerCase()}/v1`,
-						{
-							headers: {
-								Authorization: `Bearer ${env.LUNARCRUSH_API_KEY}`,
-							},
-						}
-					);
-
-					if (response.ok) {
-						const data = await response.json();
-
-						if (data.data) {
-							const coinData = data.data;
-							const formatted = {
-								symbol: symbol.toUpperCase(),
-								name: coinData.name || 'Unknown',
-								price: coinData.price || 0,
-								galaxyScore: coinData.galaxy_score || 0,
-								altRank: coinData.alt_rank || 0,
-								marketCap: coinData.market_cap || 0,
-								volume24h: coinData.volume_24h || 0,
-								percentChange24h: coinData.percent_change_24h || 0,
-								percentChange7d: coinData.percent_change_7d || 0,
-								percentChange30d: coinData.percent_change_30d || 0,
-								volatility: coinData.volatility || 0,
-								marketCapRank: coinData.market_cap_rank || 0,
-								timestamp: new Date().toISOString(),
-								isMockData: false,
-							};
-
-							return new Response(JSON.stringify(formatted), {
-								headers: {
-									'Content-Type': 'application/json',
-									'Access-Control-Allow-Origin': '*',
-									'Cache-Control': 'public, max-age=300',
-								},
-							});
-						}
-					}
-				}
-
-				// Fall back to mock data
+			// Check if API key is available
+			if (!env.LUNARCRUSH_API_KEY) {
+				console.log('No API key available, using mock data');
 				const mockData = getMockData(symbol);
 				return new Response(JSON.stringify(mockData), {
 					headers: {
@@ -194,8 +151,103 @@ export default {
 						'Cache-Control': 'public, max-age=60',
 					},
 				});
+			}
+
+			// We have an API key, so try the real API
+			try {
+				const response = await fetch(
+					`https://lunarcrush.com/api4/public/coins/${symbol.toLowerCase()}/v1`,
+					{
+						headers: {
+							Authorization: `Bearer ${env.LUNARCRUSH_API_KEY}`,
+						},
+					}
+				);
+
+				// If unauthorized or forbidden, the API key is invalid
+				if (response.status === 401 || response.status === 403) {
+					console.log('API key invalid or unauthorized, using mock data');
+					const mockData = getMockData(symbol);
+					return new Response(JSON.stringify(mockData), {
+						headers: {
+							'Content-Type': 'application/json',
+							'Access-Control-Allow-Origin': '*',
+							'Cache-Control': 'public, max-age=60',
+						},
+					});
+				}
+
+				// If we get a successful response from the API
+				if (response.ok) {
+					const data = await response.json();
+
+					// Check if the coin exists in the API response
+					if (!data.data) {
+						// Coin doesn't exist - return proper error (don't fall back to mock data)
+						return new Response(
+							JSON.stringify({
+								error: 'Cryptocurrency not found',
+								message: `The cryptocurrency "${symbol.toUpperCase()}" was not found. Please check the symbol and try again.`,
+								suggestion:
+									'Try popular symbols like BTC, ETH, SOL, ADA, MATIC, DOT, etc.',
+							}),
+							{
+								status: 404,
+								headers: {
+									'Content-Type': 'application/json',
+									'Access-Control-Allow-Origin': '*',
+								},
+							}
+						);
+					}
+
+					// Format real API response
+					const coinData = data.data;
+					const formatted = {
+						symbol: symbol.toUpperCase(),
+						name: coinData.name || 'Unknown',
+						price: coinData.price || 0,
+						galaxyScore: coinData.galaxy_score || 0,
+						altRank: coinData.alt_rank || 0,
+						marketCap: coinData.market_cap || 0,
+						volume24h: coinData.volume_24h || 0,
+						percentChange24h: coinData.percent_change_24h || 0,
+						percentChange7d: coinData.percent_change_7d || 0,
+						percentChange30d: coinData.percent_change_30d || 0,
+						volatility: coinData.volatility || 0,
+						marketCapRank: coinData.market_cap_rank || 0,
+						timestamp: new Date().toISOString(),
+						isMockData: false,
+					};
+
+					return new Response(JSON.stringify(formatted), {
+						headers: {
+							'Content-Type': 'application/json',
+							'Access-Control-Allow-Origin': '*',
+							'Cache-Control': 'public, max-age=300',
+						},
+					});
+				} else {
+					// API returned an error (500, etc.) - this is a server issue, fall back to mock
+					console.log(
+						'LunarCrush API server error, using mock data:',
+						response.status
+					);
+					const mockData = getMockData(symbol);
+					return new Response(JSON.stringify(mockData), {
+						headers: {
+							'Content-Type': 'application/json',
+							'Access-Control-Allow-Origin': '*',
+							'Cache-Control': 'public, max-age=60',
+						},
+					});
+				}
 			} catch (error) {
-				// Always fall back to mock data on errors
+				// Network error or other exception - fall back to mock data
+				console.log(
+					'API call failed due to network/exception, using mock data:',
+					error.message
+				);
 				const mockData = getMockData(symbol);
 				return new Response(JSON.stringify(mockData), {
 					headers: {

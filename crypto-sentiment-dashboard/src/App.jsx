@@ -8,7 +8,7 @@ function App() {
 	const [symbol, setSymbol] = useState('btc');
 	const [inputError, setInputError] = useState('');
 
-	const fetchCryptoData = async (crypto) => {
+  const fetchCryptoData = async (crypto) => {
 		setLoading(true);
 		setError(null);
 
@@ -17,6 +17,10 @@ function App() {
 			const data = await response.json();
 
 			if (!response.ok) {
+				// Enhanced error handling with suggestions
+				if (response.status === 404 && data.suggestion) {
+					throw new Error(`${data.message}\n\n💡 ${data.suggestion}`);
+				}
 				throw new Error(data.message || 'Failed to fetch data');
 			}
 
@@ -196,11 +200,65 @@ function App() {
 						</div>
 					</div>
 
-					<div className='timestamp'>
+					{/* <div className='timestamp'>
 						Last updated: {new Date(cryptoData.timestamp).toLocaleString()}
-					</div>
+					</div> */}
 				</div>
 			)}
+			{/* Credits Footer */}
+			{!loading && <footer className='credits-footer'>
+				<div className='credits-content'>
+					<div className='credits-section'>
+						<h3>Powered By</h3>
+						<div className='credits-links'>
+							<a
+								href='https://lunarcrush.com'
+								target='_blank'
+								rel='noopener noreferrer'
+								className='credit-link lunarcrush'>
+								📊 LunarCrush
+								<span className='credit-desc'>
+									Cryptocurrency Market Analytics
+								</span>
+							</a>
+							<a
+								href='https://workers.cloudflare.com'
+								target='_blank'
+								rel='noopener noreferrer'
+								className='credit-link cloudflare'>
+								⚡ Cloudflare Workers
+								<span className='credit-desc'>Edge Computing Platform</span>
+							</a>
+						</div>
+					</div>
+
+					<div className='credits-section'>
+						<h3>Learn More</h3>
+						<div className='credits-links'>
+							<a
+								href='https://lunarcrush.com/about/api'
+								target='_blank'
+								rel='noopener noreferrer'
+								className='credit-link api'>
+								🔗 LunarCrush API
+								<span className='credit-desc'>Get Your API Key</span>
+							</a>
+							<a
+								href='https://github.com/danilobatson/crypto-sentiment-vite-cloudflare'
+								target='_blank'
+								rel='noopener noreferrer'
+								className='credit-link github'>
+								💻 Source Code
+								<span className='credit-desc'>View on GitHub</span>
+							</a>
+						</div>
+					</div>
+				</div>
+
+				<div className='credits-bottom'>
+					<p>Built with ❤️ using modern web technologies</p>
+				</div>
+			</footer>}
 		</div>
 	);
 }

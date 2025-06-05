@@ -97,11 +97,14 @@ body {
 .error {
   background: rgba(248, 81, 73, 0.1);
   border: 1px solid #f85149;
-  color: #ffa198;
+  color: #fca5a5;
   padding: 1rem 1.5rem;
   border-radius: 8px;
   text-align: center;
   margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  white-space: pre-line;
+  line-height: 1.5;
 }
 
 .crypto-card {
@@ -482,4 +485,93 @@ button:disabled {
   right: 0;
   height: 3px;
   background: linear-gradient(90deg, #06b6d4, #0891b2);
+}
+
+/* Credits Footer */
+.credits-footer {
+  margin-top: 4rem;
+  padding: 2rem 0 1rem 0;
+  border-top: 1px solid #30363d;
+}
+
+.credits-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.credits-section h3 {
+  color: #ffffff;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.credits-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.credit-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #ffffff;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.credit-link:hover {
+  background: #30363d;
+  border-color: #6366f1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.credit-link.lunarcrush:hover {
+  border-color: #8b5cf6;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.credit-link.cloudflare:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.credit-desc {
+  font-size: 0.8rem;
+  color: #8b949e;
+  font-weight: 400;
+}
+
+.credits-bottom {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid #21262d;
+}
+
+.credits-bottom p {
+  color: #8b949e;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Mobile credits */
+@media (max-width: 768px) {
+  .credits-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .credits-footer {
+    margin-top: 3rem;
+    padding: 1.5rem 0 1rem 0;
+  }
 }
